@@ -1,0 +1,51 @@
+LOCAL VERIFICATION (run in the development sandbox, NOT inside Docker)
+Python 3.12.3; packages from requirements.txt in a clean virtual environment
+Server: gunicorn --bind 127.0.0.1:5057 --workers 2 app:app
+
+== 1. Training (python train_model.py) ==
+epoch   1  train acc 0.7968  test acc 0.8083
+epoch  20  train acc 0.9965  test acc 0.9694
+epoch  40  train acc 0.9993  test acc 0.9694
+epoch  60  train acc 1.0000  test acc 0.9750
+epoch  80  train acc 1.0000  test acc 0.9722
+  "parameters": 4810,
+  "train_accuracy": 1.0,
+  "test_accuracy": 0.9722,
+  "epochs": 80,
+saved /home/claude/task10/model/model.npz (24.9 KB)
+
+== 2. API tests (python test_api.py --url http://127.0.0.1:5057) ==
+[PASS] GET /health returns 200 and status ok: HTTP 200 {"status": "ok", "uptime_seconds": 2.7}
+[PASS] GET / lists the endpoints: HTTP 200, endpoints=['GET /health', 'GET /model-info', 'GET /samples', 'POST /predict']
+[PASS] GET /model-info returns model metadata: HTTP 200, parameters=4810, test_accuracy=0.9722
+[PASS] GET /samples returns 10 labelled examples: HTTP 200, 10 samples
+[PASS] POST /predict classifies the 10 samples: 10/10 correct
+        true 0 -> predicted 0 (confidence 1.0)
+        true 1 -> predicted 1 (confidence 0.9989)
+        true 2 -> predicted 2 (confidence 1.0)
+        true 3 -> predicted 3 (confidence 1.0)
+        true 4 -> predicted 4 (confidence 1.0)
+        true 5 -> predicted 5 (confidence 1.0)
+        true 6 -> predicted 6 (confidence 0.9972)
+        true 7 -> predicted 7 (confidence 1.0)
+        true 8 -> predicted 8 (confidence 0.9951)
+        true 9 -> predicted 9 (confidence 0.9837)
+[PASS] POST /predict batch of 10 instances: HTTP 200, count=10, inference_ms=0.19
+[PASS] Wrong input length is rejected with 400: HTTP 400 {"error": "Each image needs exactly 64 pixel values (flattened 8x8)."}
+[PASS] Non-numeric pixels are rejected with 400: HTTP 400 {"error": "All pixel values must be numbers."}
+[PASS] Out-of-range pixels are rejected with 400: HTTP 400 {"error": "Pixel values must be finite numbers between 0 and 16."}
+[PASS] Invalid JSON is rejected with 400: HTTP 400 {"error": "Request body must be a JSON object with \"pixels\" or \"instances\"."}
+[PASS] Unknown route returns JSON 404: HTTP 404 {"error": "Route not found."}
+[PASS] GET on /predict returns JSON 405: HTTP 405 {"error": "Method not allowed for this route."}
+[PASS] Latency of 50 sequential /predict calls measured: {"requests": 50, "mean_ms": 0.92, "median_ms": 0.92, "max_ms": 1.12}
+
+13/13 checks passed
+exit code: 0
+
+== 3. gunicorn access log (first 6 lines) ==
+127.0.0.1 - - [09/Oct/2026:02:44:22 +0000] "GET /health HTTP/1.1" 200 37 "-" "Python-urllib/3.12"
+127.0.0.1 - - [09/Oct/2026:02:44:22 +0000] "GET / HTTP/1.1" 200 296 "-" "Python-urllib/3.12"
+127.0.0.1 - - [09/Oct/2026:02:44:22 +0000] "GET /model-info HTTP/1.1" 200 433 "-" "Python-urllib/3.12"
+127.0.0.1 - - [09/Oct/2026:02:44:22 +0000] "POST /predict HTTP/1.1" 200 221 "-" "Python-urllib/3.12"
+127.0.0.1 - - [09/Oct/2026:02:44:22 +0000] "GET /samples HTTP/1.1" 200 2970 "-" "Python-urllib/3.12"
+127.0.0.1 - - [09/Oct/2026:02:44:22 +0000] "POST /predict HTTP/1.1" 200 251 "-" "Python-urllib/3.12"

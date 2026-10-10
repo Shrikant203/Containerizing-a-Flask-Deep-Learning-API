@@ -1,0 +1,402 @@
+Task 10 Docker command log - generated 2026-10-10 02:05:57
+==============================================================================
+
+[1] 1. Verify Docker - Docker version  (2026-10-10 02:05:15)
+$ docker --version && docker version --format 'Client: {{.Client.Version}} | Server: {{.Server.Version}}'
+Docker version 29.8.2, build 7fc2dff
+Client: 29.8.2 | Server: 29.8.2
+(exit code 0)
+------------------------------------------------------------------------------
+
+[2] 1. Verify Docker - Engine information  (2026-10-10 02:05:15)
+$ docker info --format 'Containers: {{.Containers}} | Images: {{.Images}} | Storage driver: {{.Driver}} | OS: {{.OperatingSystem}}'
+Containers: 0 | Images: 20 | Storage driver: overlayfs | OS: Docker Desktop
+(exit code 0)
+------------------------------------------------------------------------------
+
+[3] 2. Build the images and compare their size - Build the baseline image (un-optimized Dockerfile)  (2026-10-10 02:05:16)
+$ docker build -f Dockerfile.baseline -t flask-dl-api:baseline .
+
+[stderr]
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.baseline
+#1 transferring dockerfile: 246B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.12
+#2 ...
+
+#3 [auth] library/python:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.12
+#2 DONE 1.7s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 295B done
+#4 DONE 0.0s
+
+#5 [1/4] FROM docker.io/library/python:3.12@sha256:63828510c8b5ccce3bf0d6fabd6f3d17d4effa1ffe690f80a67c8e2d394e03ee
+#5 resolve docker.io/library/python:3.12@sha256:63828510c8b5ccce3bf0d6fabd6f3d17d4effa1ffe690f80a67c8e2d394e03ee done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 38.26kB done
+#6 DONE 0.0s
+
+#7 [2/4] WORKDIR /app
+#7 CACHED
+
+#8 [3/4] COPY . .
+#8 CACHED
+
+#9 [4/4] RUN pip install -r requirements.txt
+#9 CACHED
+
+#10 exporting to image
+#10 exporting layers done
+#10 exporting manifest sha256:8f147c2c672e67b0c51df0c64e6f9d496c4cccecb7e7deb67bd2950cc06c42c1 done
+#10 exporting config sha256:d93fb7669780331d1b39ad89a12da3ba2a1f69d5768ee19f8602472911b43daf done
+#10 exporting attestation manifest sha256:397dfe875565822f4c7c0c3237bb918591f4cd8c9c0a5cbee0f2b127bb4f1cad done
+#10 exporting manifest list sha256:af5ebbd69f5f404cce3962489f2b74b7e002de710381efcd9d13cefbb8582f4c done
+#10 naming to docker.io/library/flask-dl-api:baseline done
+#10 unpacking to docker.io/library/flask-dl-api:baseline done
+#10 DONE 0.0s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/c7rgum36qxd55a65a7gspssbs
+(exit code 0)
+------------------------------------------------------------------------------
+
+[4] 2. Build the images and compare their size - Build the optimized image (multi-stage Dockerfile)  (2026-10-10 02:05:18)
+$ docker build -t flask-dl-api:1.0 .
+
+[stderr]
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.02kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim
+#2 DONE 0.4s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 295B done
+#3 DONE 0.0s
+
+#4 [internal] load build context
+#4 transferring context: 125B done
+#4 DONE 0.0s
+
+#5 [builder 1/4] FROM docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
+#5 resolve docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1 0.0s done
+#5 CACHED
+
+#6 [builder 2/4] WORKDIR /build
+#6 DONE 0.0s
+
+#7 [builder 3/4] COPY requirements.txt .
+#7 DONE 0.0s
+
+#8 [builder 4/4] RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+#8 ...
+
+#9 [stage-1 2/6] RUN useradd --create-home --uid 10001 --shell /usr/sbin/nologin appuser
+#9 DONE 0.6s
+
+#10 [stage-1 3/6] WORKDIR /app
+#10 DONE 0.0s
+
+#8 [builder 4/4] RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+#8 2.369 Collecting blinker==1.9.0 (from -r requirements.txt (line 1))
+#8 2.447   Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+#8 2.468 Collecting click==8.5.0 (from -r requirements.txt (line 2))
+#8 2.480   Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+#8 2.500 Collecting Flask==3.1.3 (from -r requirements.txt (line 3))
+#8 2.512   Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
+#8 2.534 Collecting gunicorn==26.2.0 (from -r requirements.txt (line 4))
+#8 2.545   Downloading gunicorn-26.2.0-py3-none-any.whl.metadata (5.5 kB)
+#8 2.563 Collecting itsdangerous==2.2.0 (from -r requirements.txt (line 5))
+#8 2.574   Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+#8 2.588 Collecting Jinja2==3.1.6 (from -r requirements.txt (line 6))
+#8 2.600   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+#8 2.673 Collecting MarkupSafe==3.0.4 (from -r requirements.txt (line 7))
+#8 2.683   Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (2.7 kB)
+#8 3.197 Collecting numpy==2.5.3 (from -r requirements.txt (line 8))
+#8 3.207   Downloading numpy-2.5.3-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl.metadata (6.6 kB)
+#8 3.226 Collecting Werkzeug==3.1.9 (from -r requirements.txt (line 9))
+#8 3.235   Downloading werkzeug-3.1.9-py3-none-any.whl.metadata (4.1 kB)
+#8 3.259 Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+#8 3.270 Downloading click-8.5.0-py3-none-any.whl (125 kB)
+#8 3.310 Downloading flask-3.1.3-py3-none-any.whl (103 kB)
+#8 3.319 Downloading gunicorn-26.2.0-py3-none-any.whl (228 kB)
+#8 3.331 Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+#8 3.340 Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+#8 3.416 Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (24 kB)
+#8 3.425 Downloading numpy-2.5.3-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (15.7 MB)
+#8 7.473    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 15.7/15.7 MB 3.8 MB/s eta 0:00:00
+#8 7.486 Downloading werkzeug-3.1.9-py3-none-any.whl (228 kB)
+#8 7.570 Installing collected packages: numpy, MarkupSafe, itsdangerous, gunicorn, click, blinker, Werkzeug, Jinja2, Flask
+#8 10.57 Successfully installed Flask-3.1.3 Jinja2-3.1.6 MarkupSafe-3.0.4 Werkzeug-3.1.9 blinker-1.9.0 click-8.5.0 gunicorn-26.2.0 itsdangerous-2.2.0 numpy-2.5.3
+#8 10.57 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#8 10.67 
+#8 10.67 [notice] A new release of pip is available: 25.0.1 -> 26.2.1
+#8 10.67 [notice] To update, run: pip install --upgrade pip
+#8 DONE 10.9s
+
+#11 [stage-1 4/6] COPY --from=builder /install /usr/local
+#11 DONE 0.6s
+
+#12 [stage-1 5/6] COPY app.py .
+#12 DONE 0.0s
+
+#13 [stage-1 6/6] COPY model/ model/
+#13 DONE 0.0s
+
+#14 exporting to image
+#14 exporting layers
+#14 exporting layers 2.3s done
+#14 exporting manifest sha256:f9952b2ddf954f47ecee6db10868a99e576ffae03389fd46e0b161e502c5a25b done
+#14 exporting config sha256:79cdd41ec6b7f85ee077e2c2c1897af577931be042c3985877013ca843dcf310 done
+#14 exporting attestation manifest sha256:014210c574f035d5604e35464af8a6403d95199f49fdf0e58faab3d36a28d48d done
+#14 exporting manifest list sha256:2f46c8e2450aa0e7e55e2bdf45dbe8c4b46397acc129c2a85acac7b6f86ca3ff done
+#14 naming to docker.io/library/flask-dl-api:1.0 done
+#14 unpacking to docker.io/library/flask-dl-api:1.0
+#14 unpacking to docker.io/library/flask-dl-api:1.0 0.6s done
+#14 DONE 2.9s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/f22x91f0fhwqp8yjh1bbnqxt6
+(exit code 0)
+------------------------------------------------------------------------------
+
+[5] 2. Build the images and compare their size - List the images  (2026-10-10 02:05:34)
+$ docker images flask-dl-api --format 'table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.Size}}'
+REPOSITORY     TAG        IMAGE ID       SIZE
+flask-dl-api   1.0        2f46c8e2450a   303MB
+flask-dl-api   baseline   af5ebbd69f5f   1.75GB
+(exit code 0)
+------------------------------------------------------------------------------
+
+[6] 2. Build the images and compare their size - Image size of the baseline in bytes  (2026-10-10 02:05:34)
+$ docker image inspect flask-dl-api:baseline --format '{{.Size}}'
+1752970368
+(exit code 0)
+------------------------------------------------------------------------------
+
+[7] 2. Build the images and compare their size - Image size of the optimized image in bytes  (2026-10-10 02:05:34)
+$ docker image inspect flask-dl-api:1.0 --format '{{.Size}}'
+303293360
+(exit code 0)
+------------------------------------------------------------------------------
+
+[8] 2. Build the images and compare their size - Layer history of the optimized image  (2026-10-10 02:05:34)
+$ docker history flask-dl-api:1.0
+IMAGE          CREATED          CREATED BY                                      SIZE      COMMENT
+2f46c8e2450a   3 seconds ago    CMD ["gunicorn" "--bind" "0.0.0.0:5000" "--w…   0B        buildkit.dockerfile.v0
+<missing>      3 seconds ago    HEALTHCHECK {Test:[CMD python -c import urll…   0B        buildkit.dockerfile.v0
+<missing>      3 seconds ago    EXPOSE [5000/tcp]                               0B        buildkit.dockerfile.v0
+<missing>      3 seconds ago    USER appuser                                    0B        buildkit.dockerfile.v0
+<missing>      3 seconds ago    COPY model/ model/ # buildkit                   41kB      buildkit.dockerfile.v0
+<missing>      3 seconds ago    COPY app.py . # buildkit                        16.4kB    buildkit.dockerfile.v0
+<missing>      3 seconds ago    COPY /install /usr/local # buildkit             78.3MB    buildkit.dockerfile.v0
+<missing>      15 seconds ago   WORKDIR /app                                    8.19kB    buildkit.dockerfile.v0
+<missing>      15 seconds ago   RUN /bin/sh -c useradd --create-home --uid 1…   69.6kB    buildkit.dockerfile.v0
+<missing>      15 seconds ago   ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFER…   0B        buildkit.dockerfile.v0
+<missing>      3 days ago       CMD ["python3"]                                 0B        buildkit.dockerfile.v0
+<missing>      3 days ago       RUN /bin/sh -c set -eux;  for src in idle3 p…   16.4kB    buildkit.dockerfile.v0
+<missing>      3 days ago       RUN /bin/sh -c set -eux;   savedAptMark="$(a…   44.6MB    buildkit.dockerfile.v0
+<missing>      3 days ago       ENV PYTHON_SHA256=c2c4321961fab0fb999d66e0ce…   0B        buildkit.dockerfile.v0
+<missing>      3 days ago       ENV PYTHON_VERSION=3.12.15                      0B        buildkit.dockerfile.v0
+<missing>      3 days ago       ENV GPG_KEY=7169605F62C751356D054A26A821E680…   0B        buildkit.dockerfile.v0
+<missing>      3 days ago       RUN /bin/sh -c set -eux;  apt-get update;  a…   4.99MB    buildkit.dockerfile.v0
+<missing>      3 days ago       ENV LANG=C.UTF-8                                0B        buildkit.dockerfile.v0
+<missing>      3 days ago       ENV PATH=/usr/local/bin:/usr/local/sbin:/usr…   0B        buildkit.dockerfile.v0
+<missing>      4 days ago       # debian.sh --arch 'arm64' out/ 'trixie' '@1…   110MB     debuerreotype 0.17
+(exit code 0)
+------------------------------------------------------------------------------
+
+[9] 3. Run the container locally - Start the container (host port 8000 -> container port 5000)  (2026-10-10 02:05:34)
+$ docker run -d --name flask-dl-api -p 8000:5000 flask-dl-api:1.0
+a82e4686a00ae31bd7b66ac1c9ade77881f856301854cbdf2e6041c2fef50ca2
+(exit code 0)
+------------------------------------------------------------------------------
+
+[10] 3. Run the container locally - Wait until the HEALTHCHECK reports healthy  (2026-10-10 02:05:34)
+$ for i in $(seq 1 40); do s=$(docker inspect --format '{{.State.Health.Status}}' flask-dl-api); echo "check $i: $s"; [ "$s" = healthy ] && break; sleep 2; done; [ "$s" = healthy ]
+check 1: starting
+check 2: starting
+check 3: starting
+check 4: healthy
+(exit code 0)
+------------------------------------------------------------------------------
+
+[11] 3. Run the container locally - List the running container  (2026-10-10 02:05:40)
+$ docker ps --filter name=flask-dl-api --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+NAMES          IMAGE              STATUS                   PORTS
+flask-dl-api   flask-dl-api:1.0   Up 6 seconds (healthy)   0.0.0.0:8000->5000/tcp, [::]:8000->5000/tcp
+(exit code 0)
+------------------------------------------------------------------------------
+
+[12] 4. Verify API functionality - GET /health  (2026-10-10 02:05:41)
+$ curl -s http://localhost:8000/health
+{"status":"ok","uptime_seconds":5.5}
+(exit code 0)
+------------------------------------------------------------------------------
+
+[13] 4. Verify API functionality - GET /model-info  (2026-10-10 02:05:41)
+$ curl -s http://localhost:8000/model-info
+{"architecture":"Input 64 -> Dense 64 + ReLU -> Dense 10 + Softmax","classes":[0,1,2,3,4,5,6,7,8,9],"dataset":"UCI handwritten digits (sklearn load_digits), 8x8 grayscale","epochs":80,"input":"64 pixel values in the range 0-16 (flattened 8x8 image)","name":"digits-mlp","numpy_version":"2.4.4","parameters":4810,"seed":42,"test_accuracy":0.9722,"test_samples":360,"train_accuracy":1.0,"train_samples":1437,"trained_on":"2026-10-09"}
+(exit code 0)
+------------------------------------------------------------------------------
+
+[14] 4. Verify API functionality - POST /predict with a sample image of the digit 3  (2026-10-10 02:05:41)
+$ curl -s -X POST -H 'Content-Type: application/json' -d '{"pixels": [0.0, 1.0, 11.0, 15.0, 16.0, 9.0, 0.0, 0.0, 0.0, 3.0, 16.0, 10.0, 10.0, 16.0, 1.0, 0.0, 0.0, 0.0, 2.0, 1.0, 14.0, 11.0, 0.0, 0.0, 0.0, 0.0, 0.0, 14.0, 16.0, 7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 13.0, 16.0, 16.0, 5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 16.0, 8.0, 0.0, 0.0, 0.0, 6.0, 8.0, 13.0, 15.0, 5.0, 0.0, 0.0, 0.0, 15.0, 16.0, 12.0, 5.0, 0.0, 0.0]}' http://localhost:8000/predict
+{"confidence":1.0,"count":1,"digit":3,"inference_ms":0.912,"predictions":[{"confidence":1.0,"digit":3,"probabilities":[0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0]}],"probabilities":[0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0]}
+(exit code 0)
+------------------------------------------------------------------------------
+
+[15] 4. Verify API functionality - POST /predict with invalid input (expect HTTP 400)  (2026-10-10 02:05:41)
+$ curl -s -w '\nHTTP status: %{http_code}\n' -X POST -H 'Content-Type: application/json' -d '{"pixels":[1,2,3]}' http://localhost:8000/predict
+{"error":"Each image needs exactly 64 pixel values (flattened 8x8)."}
+
+HTTP status: 400
+(exit code 0)
+------------------------------------------------------------------------------
+
+[16] 4. Verify API functionality - Full API test suite (test_api.py)  (2026-10-10 02:05:41)
+$ python3 test_api.py --url http://localhost:8000 --out api_test_results.json
+[PASS] GET /health returns 200 and status ok: HTTP 200 {"status": "ok", "uptime_seconds": 6.4}
+[PASS] GET / lists the endpoints: HTTP 200, endpoints=['GET /health', 'GET /model-info', 'GET /samples', 'POST /predict']
+[PASS] GET /model-info returns model metadata: HTTP 200, parameters=4810, test_accuracy=0.9722
+[PASS] GET /samples returns 10 labelled examples: HTTP 200, 10 samples
+[PASS] POST /predict classifies the 10 samples: 10/10 correct
+        true 0 -> predicted 0 (confidence 1.0)
+        true 1 -> predicted 1 (confidence 0.9989)
+        true 2 -> predicted 2 (confidence 1.0)
+        true 3 -> predicted 3 (confidence 1.0)
+        true 4 -> predicted 4 (confidence 1.0)
+        true 5 -> predicted 5 (confidence 1.0)
+        true 6 -> predicted 6 (confidence 0.9972)
+        true 7 -> predicted 7 (confidence 1.0)
+        true 8 -> predicted 8 (confidence 0.9951)
+        true 9 -> predicted 9 (confidence 0.9837)
+[PASS] POST /predict batch of 10 instances: HTTP 200, count=10, inference_ms=1.131
+[PASS] Wrong input length is rejected with 400: HTTP 400 {"error": "Each image needs exactly 64 pixel values (flattened 8x8)."}
+[PASS] Non-numeric pixels are rejected with 400: HTTP 400 {"error": "All pixel values must be numbers."}
+[PASS] Out-of-range pixels are rejected with 400: HTTP 400 {"error": "Pixel values must be finite numbers between 0 and 16."}
+[PASS] Invalid JSON is rejected with 400: HTTP 400 {"error": "Request body must be a JSON object with \"pixels\" or \"instances\"."}
+[PASS] Unknown route returns JSON 404: HTTP 404 {"error": "Route not found."}
+[PASS] GET on /predict returns JSON 405: HTTP 405 {"error": "Method not allowed for this route."}
+[PASS] Latency of 50 sequential /predict calls measured: {"requests": 50, "mean_ms": 1.36, "median_ms": 1.3, "max_ms": 2.38}
+
+13/13 checks passed
+(exit code 0)
+------------------------------------------------------------------------------
+
+[17] 5. Inspect the container and check the optimizations - User inside the container (should not be root)  (2026-10-10 02:05:42)
+$ docker exec flask-dl-api id
+uid=10001(appuser) gid=10001(appuser) groups=10001(appuser)
+(exit code 0)
+------------------------------------------------------------------------------
+
+[18] 5. Inspect the container and check the optimizations - Container configuration and health  (2026-10-10 02:05:42)
+$ docker inspect flask-dl-api --format 'User={{.Config.User}} | Health={{.State.Health.Status}} | Image={{.Config.Image}}'
+User=appuser | Health=healthy | Image=flask-dl-api:1.0
+(exit code 0)
+------------------------------------------------------------------------------
+
+[19] 5. Inspect the container and check the optimizations - Training-only dependency is absent from the image  (2026-10-10 02:05:42)
+$ docker exec flask-dl-api python -c "import importlib.util as u; print('scikit-learn installed:', u.find_spec('sklearn') is not None); print('numpy installed:', u.find_spec('numpy') is not None)"
+scikit-learn installed: False
+numpy installed: True
+(exit code 0)
+------------------------------------------------------------------------------
+
+[20] 5. Inspect the container and check the optimizations - Files inside the image  (2026-10-10 02:05:42)
+$ docker exec flask-dl-api ls -la /app /app/model
+/app:
+total 20
+drwxr-xr-x 1 root root 4096 Oct  9 20:35 .
+drwxr-xr-x 1 root root 4096 Oct  9 20:35 ..
+-rw-r--r-- 1 root root 4274 Oct  9 02:42 app.py
+drwxr-xr-x 2 root root 4096 Oct  9 15:19 model
+
+/app/model:
+total 36
+drwxr-xr-x 2 root root  4096 Oct  9 15:19 .
+drwxr-xr-x 1 root root  4096 Oct  9 20:35 ..
+-rw-r--r-- 1 root root 25458 Oct  9 02:44 model.npz
+(exit code 0)
+------------------------------------------------------------------------------
+
+[21] 5. Inspect the container and check the optimizations - Container logs (gunicorn access log)  (2026-10-10 02:05:42)
+$ docker logs --tail 12 flask-dl-api
+192.168.65.1 - - [09/Oct/2026:20:35:42 +0000] "POST /predict HTTP/1.1" 200 245 "-" "Python-urllib/3.13"
+192.168.65.1 - - [09/Oct/2026:20:35:42 +0000] "POST /predict HTTP/1.1" 200 255 "-" "Python-urllib/3.13"
+192.168.65.1 - - [09/Oct/2026:20:35:42 +0000] "POST /predict HTTP/1.1" 200 221 "-" "Python-urllib/3.13"
+192.168.65.1 - - [09/Oct/2026:20:35:42 +0000] "POST /predict HTTP/1.1" 200 251 "-" "Python-urllib/3.13"
+192.168.65.1 - - [09/Oct/2026:20:35:42 +0000] "POST /predict HTTP/1.1" 200 221 "-" "Python-urllib/3.13"
+192.168.65.1 - - [09/Oct/2026:20:35:42 +0000] "POST /predict HTTP/1.1" 200 221 "-" "Python-urllib/3.13"
+192.168.65.1 - - [09/Oct/2026:20:35:42 +0000] "POST /predict HTTP/1.1" 200 221 "-" "Python-urllib/3.13"
+192.168.65.1 - - [09/Oct/2026:20:35:42 +0000] "POST /predict HTTP/1.1" 200 221 "-" "Python-urllib/3.13"
+192.168.65.1 - - [09/Oct/2026:20:35:42 +0000] "POST /predict HTTP/1.1" 200 245 "-" "Python-urllib/3.13"
+192.168.65.1 - - [09/Oct/2026:20:35:42 +0000] "POST /predict HTTP/1.1" 200 221 "-" "Python-urllib/3.13"
+192.168.65.1 - - [09/Oct/2026:20:35:42 +0000] "POST /predict HTTP/1.1" 200 245 "-" "Python-urllib/3.13"
+192.168.65.1 - - [09/Oct/2026:20:35:42 +0000] "POST /predict HTTP/1.1" 200 255 "-" "Python-urllib/3.13"
+(exit code 0)
+------------------------------------------------------------------------------
+
+[22] 5. Inspect the container and check the optimizations - Resource usage  (2026-10-10 02:05:42)
+$ docker stats --no-stream flask-dl-api
+CONTAINER ID   NAME           CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O   PIDS
+a82e4686a00a   flask-dl-api   0.02%     97.65MiB / 7.748GiB   1.23%     70.1kB / 61.1kB   31MB / 0B   22
+(exit code 0)
+------------------------------------------------------------------------------
+
+[23] 5. Inspect the container and check the optimizations - Restart the container and check that the API recovers  (2026-10-10 02:05:43)
+$ docker restart flask-dl-api && for i in $(seq 1 40); do s=$(docker inspect --format '{{.State.Health.Status}}' flask-dl-api); echo "check $i: $s"; [ "$s" = healthy ] && break; sleep 2; done; [ "$s" = healthy ] && curl -s http://localhost:8000/health
+flask-dl-api
+check 1: starting
+check 2: starting
+check 3: starting
+check 4: healthy
+{"status":"ok","uptime_seconds":5.6}
+(exit code 0)
+------------------------------------------------------------------------------
+
+[24] 6. Compare with the baseline container - Start the baseline container (host port 8001)  (2026-10-10 02:05:50)
+$ docker run -d --name flask-dl-api-baseline -p 8001:5000 flask-dl-api:baseline && sleep 4 && docker ps --filter name=flask-dl-api-baseline --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+4e01bb4c67f7b3f91aeaf66a77e6597c50203270e28da4a2e488154db2dae398
+NAMES                   IMAGE                   STATUS         PORTS
+flask-dl-api-baseline   flask-dl-api:baseline   Up 4 seconds   0.0.0.0:8001->5000/tcp, [::]:8001->5000/tcp
+(exit code 0)
+------------------------------------------------------------------------------
+
+[25] 6. Compare with the baseline container - Baseline API responds  (2026-10-10 02:05:54)
+$ curl -s http://localhost:8001/health
+{"status":"ok","uptime_seconds":3.5}
+(exit code 0)
+------------------------------------------------------------------------------
+
+[26] 6. Compare with the baseline container - User inside the baseline container  (2026-10-10 02:05:54)
+$ docker exec flask-dl-api-baseline id
+uid=0(root) gid=0(root) groups=0(root)
+(exit code 0)
+------------------------------------------------------------------------------
+
+[27] 6. Compare with the baseline container - Resource usage of both containers  (2026-10-10 02:05:54)
+$ docker stats --no-stream flask-dl-api flask-dl-api-baseline
+CONTAINER ID   NAME                    CPU %     MEM USAGE / LIMIT     MEM %     NET I/O         BLOCK I/O     PIDS
+a82e4686a00a   flask-dl-api            0.03%     68.77MiB / 7.748GiB   0.87%     1.91kB / 796B   0B / 0B       22
+4e01bb4c67f7   flask-dl-api-baseline   0.03%     86.24MiB / 7.748GiB   1.09%     1.47kB / 709B   68.3MB / 0B   10
+(exit code 0)
+------------------------------------------------------------------------------
+
+[28] 7. Cleanup - Remove the containers (images are kept)  (2026-10-10 02:05:56)
+$ docker rm -f flask-dl-api flask-dl-api-baseline && docker ps -a --format 'table {{.Names}}\t{{.Status}}'
+flask-dl-api
+flask-dl-api-baseline
+NAMES     STATUS
+(exit code 0)
+------------------------------------------------------------------------------
